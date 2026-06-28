@@ -1,6 +1,7 @@
 "use client";
 
 import { BrainCircuit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 
 interface PredictButtonProps {
@@ -17,26 +18,19 @@ export function PredictButton({
   className,
 }: PredictButtonProps) {
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={isLoading || disabled}
       className={clsx(
-        "w-full flex items-center justify-center gap-2.5 px-5 py-3 rounded-lg text-sm font-semibold transition-all duration-200",
-        "bg-gradient-to-r from-primary to-[#FFB84D] text-background",
-        "hover:shadow-glow active:scale-[0.98]",
-        isLoading
-          ? "opacity-70 cursor-wait"
-          : disabled
-            ? "opacity-40 cursor-not-allowed"
-            : "animate-pulse-glow",
+        "w-full bg-primary text-black font-bold border border-primary hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(204,255,0,0.4)] transition-all duration-300",
         className
       )}
     >
       <BrainCircuit
         size={18}
-        className={clsx(isLoading && "animate-spin")}
+        className={clsx("mr-2", isLoading && "animate-spin")}
       />
       <span>{isLoading ? "Running Model..." : "Run AI Prediction"}</span>
-    </button>
+    </Button>
   );
 }

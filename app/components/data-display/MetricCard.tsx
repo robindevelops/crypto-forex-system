@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { InfoTooltip } from "@/app/components/ui/InfoTooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import clsx from "clsx";
 
 interface MetricCardProps {
@@ -51,42 +53,34 @@ export function MetricCard({
   const isNegative = change !== undefined && change < 0;
 
   return (
-    <div
+    <Card
       ref={ref}
       className={clsx(
-        "glass-card p-4 md:p-5 relative overflow-hidden transition-all duration-300",
-        "hover:border-border-hover hover:shadow-md",
+        "relative overflow-hidden transition-all duration-300 hover:shadow-md",
         animate && isVisible ? "animate-fade-in-up" : animate ? "opacity-0" : ""
       )}
     >
       {/* Accent top border */}
       {accentColor && (
         <div
-          className="absolute top-0 left-0 right-0 h-[2px]"
+          className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ backgroundColor: accentColor }}
         />
       )}
 
-      {/* Label row */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-1.5">
-          {icon && (
-            <span className="text-text-muted">{icon}</span>
-          )}
-          <span className="text-xs font-medium text-text-secondary uppercase tracking-wide">
-            {label}
-          </span>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          {icon && <span className="text-muted-foreground">{icon}</span>}
+          {label}
           {tooltip && <InfoTooltip content={tooltip} />}
-        </div>
-
-        {/* Change indicator */}
+        </CardTitle>
         {change !== undefined && (
-          <div
+          <Badge
+            variant={isPositive ? "default" : isNegative ? "destructive" : "secondary"}
             className={clsx(
-              "flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full",
-              isPositive && "text-success bg-success/10",
-              isNegative && "text-error bg-error/10",
-              !isPositive && !isNegative && "text-text-muted bg-surface-hover"
+              "flex items-center gap-1",
+              isPositive && "bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25",
+              isNegative && "bg-rose-500/15 text-rose-600 hover:bg-rose-500/25"
             )}
           >
             {isPositive ? (
@@ -101,24 +95,24 @@ export function MetricCard({
               {change.toFixed(2)}
               {changeSuffix}
             </span>
-          </div>
+          </Badge>
         )}
-      </div>
-
-      {/* Value */}
-      <p
-        className={clsx(
-          "text-2xl md:text-3xl font-bold font-mono tracking-tight text-text-primary",
-          animate && isVisible && "animate-fade-in"
-        )}
-        style={
-          animate && isVisible
-            ? { animationDelay: "100ms", animationDuration: "500ms" }
-            : undefined
-        }
-      >
-        {value}
-      </p>
-    </div>
+      </CardHeader>
+      <CardContent>
+        <div
+          className={clsx(
+            "text-2xl md:text-3xl font-bold tracking-tight",
+            animate && isVisible && "animate-fade-in"
+          )}
+          style={
+            animate && isVisible
+              ? { animationDelay: "100ms", animationDuration: "500ms" }
+              : undefined
+          }
+        >
+          {value}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

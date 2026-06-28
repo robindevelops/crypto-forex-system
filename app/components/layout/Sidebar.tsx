@@ -24,11 +24,9 @@ const NAV_ITEMS = [
   { href: ROUTES.PREDICT, label: "AI Prediction", icon: BrainCircuit },
   { href: ROUTES.MODELS, label: "Model Comparison", icon: GitCompare },
   { href: ROUTES.INDICATORS, label: "Indicators", icon: Activity },
-  { href: ROUTES.REPORTS, label: "Reports", icon: FileBarChart },
 ];
 
 const BOTTOM_NAV = [
-  { href: ROUTES.ADMIN, label: "Admin Panel", icon: ShieldCheck, badge: "Admin" },
   { href: ROUTES.SETTINGS, label: "Settings", icon: Settings },
   { href: ROUTES.HELP, label: "Help & Docs", icon: HelpCircle },
 ];
@@ -64,16 +62,6 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Asset Selector */}
-      <div
-        className={clsx(
-          "border-b-2 border-border shrink-0",
-          sidebarCollapsed ? "py-3" : "p-4"
-        )}
-      >
-        <AssetSelector collapsed={sidebarCollapsed} />
-      </div>
-
       {/* Main Navigation */}
       <nav className={clsx("flex-1 overflow-y-auto py-3", sidebarCollapsed ? "px-2" : "px-3")}>
         <div className="space-y-1">
@@ -86,6 +74,16 @@ export function Sidebar() {
           ))}
         </div>
       </nav>
+
+      {/* Asset Selector */}
+      <div
+        className={clsx(
+          "border-t-2 border-border shrink-0",
+          sidebarCollapsed ? "py-3" : "p-4"
+        )}
+      >
+        <AssetSelector collapsed={sidebarCollapsed} />
+      </div>
 
       {/* Bottom Navigation */}
       <div

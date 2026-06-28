@@ -24,6 +24,8 @@ import {
   Activity,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   const { selectedAsset, activeIndicators } = useAssetStore();
@@ -38,7 +40,7 @@ export default function DashboardPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
             <span
               className="w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold"
               style={{
@@ -50,7 +52,7 @@ export default function DashboardPage() {
             </span>
             {asset.name} Dashboard
           </h1>
-          <p className="text-sm text-text-secondary mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Real-time price data with AI-powered analysis
           </p>
         </div>
@@ -109,7 +111,7 @@ export default function DashboardPage() {
       </MetricCardGrid>
 
       {/* Main Content: Chart + Sidebar Controls */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-6">
         {/* Chart Area */}
         <div className="space-y-4">
           <PriceLineChart
@@ -126,29 +128,39 @@ export default function DashboardPage() {
         {/* Right Panel: Controls */}
         <div className="space-y-4 max-xl:hidden">
           {/* Indicator Toggles */}
-          <div className="glass-card p-4">
-            <IndicatorToggle />
-          </div>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Indicators</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <IndicatorToggle />
+            </CardContent>
+          </Card>
 
           {/* Quick Predict */}
-          <div className="glass-card p-4">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted mb-3">
-              AI Prediction
-            </p>
-            <PredictButton
-              onClick={() => router.push("/predict")}
-            />
-            <p className="text-[10px] text-text-muted mt-2 text-center">
-              LSTM model • 30-day sequence
-            </p>
-          </div>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center justify-between">
+                AI Prediction
+                <Badge variant="outline" className="text-[10px]">LSTM</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <PredictButton
+                onClick={() => router.push("/predict")}
+              />
+              <p className="text-[10px] text-muted-foreground text-center">
+                Using 30-day historical sequence
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Price Stats */}
-          <div className="glass-card p-4">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted mb-3">
-              Statistics
-            </p>
-            <div className="space-y-2">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Statistics</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
               <StatRow label="Mean" value={formatCurrency(stats.mean, selectedAsset)} />
               <StatRow label="Std Dev" value={formatCurrency(stats.std, selectedAsset)} />
               <StatRow label="Min" value={formatCurrency(stats.min, selectedAsset)} />
@@ -156,14 +168,21 @@ export default function DashboardPage() {
               <StatRow label="P25" value={formatCurrency(stats.p25, selectedAsset)} />
               <StatRow label="Median" value={formatCurrency(stats.p50, selectedAsset)} />
               <StatRow label="P75" value={formatCurrency(stats.p75, selectedAsset)} />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Mobile: Indicator Controls (shown below chart) */}
-      <div className="xl:hidden glass-card p-4">
-        <IndicatorToggle />
+      <div className="xl:hidden">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Indicators</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <IndicatorToggle />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -171,9 +190,9 @@ export default function DashboardPage() {
 
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between text-xs">
-      <span className="text-text-muted">{label}</span>
-      <span className="text-text-primary font-mono">{value}</span>
+    <div className="flex items-center justify-between text-xs py-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-foreground font-mono font-medium">{value}</span>
     </div>
   );
 }

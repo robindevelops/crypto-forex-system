@@ -2,6 +2,7 @@
 
 import { useAssetStore } from "@/app/stores/assetStore";
 import { ASSET_LIST, type AssetId } from "@/app/constants/assets";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import clsx from "clsx";
 
 interface AssetSelectorProps {
@@ -42,63 +43,45 @@ export function AssetSelector({ collapsed }: AssetSelectorProps) {
     );
   }
 
+  const activeAsset = ASSET_LIST.find(a => a.id === selectedAsset);
+
   return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted px-3 mb-2">
-        Select Asset
+    <div className="space-y-1 px-3">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
+        Asset
       </p>
-      {ASSET_LIST.map((asset) => {
-        const isActive = selectedAsset === asset.id;
-        return (
-          <button
-            key={asset.id}
-            onClick={() => setSelectedAsset(asset.id as AssetId)}
-            className={clsx(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-left",
-              isActive
-                ? "bg-surface-hover"
-                : "hover:bg-surface-hover/50"
-            )}
-            aria-label={`Select ${asset.name}`}
-          >
-            {/* Color dot */}
-            <div
-              className={clsx(
-                "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0",
-                isActive ? "shadow-md" : "opacity-60"
-              )}
-              style={{
-                backgroundColor: `${asset.color}${isActive ? "25" : "15"}`,
-                color: asset.color,
-              }}
-            >
-              {asset.icon}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p
-                className={clsx(
-                  "text-sm font-medium truncate",
-                  isActive ? "text-text-primary" : "text-text-secondary"
-                )}
-              >
-                {asset.name}
-              </p>
-              <p className="text-[11px] text-text-muted font-mono">
-                {asset.ticker}
-              </p>
-            </div>
-
-            {/* Active check */}
-            {isActive && (
-              <div
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: asset.color }}
-              />
-            )}
-          </button>
-        );
-      })}
+      <Select 
+        value={selectedAsset} 
+        onValueChange={(value) => setSelectedAsset(value as AssetId)}
+      >
+        <SelectTrigger className="w-full h-12 bg-surface hover:bg-surface-hover border-border focus:ring-1 focus:ring-primary transition-colors">
+          <SelectValue>
+             {activeAsset && (
+               <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold"
+                       style={{ backgroundColor: `${activeAsset.color}25`, color: activeAsset.color }}>
+                     {activeAsset.icon}
+                  </div>
+                  <span className="font-medium">{activeAsset.name}</span>
+               </div>
+             )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {ASSET_LIST.map((asset) => (
+            <SelectItem key={asset.id} value={asset.id} className="py-2 cursor-pointer">
+               <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold"
+                       style={{ backgroundColor: `${asset.color}25`, color: asset.color }}>
+                     {asset.icon}
+                  </div>
+                  <span className="font-medium">{asset.name}</span>
+                  <span className="text-[10px] text-muted-foreground ml-2">{asset.ticker}</span>
+               </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

@@ -385,7 +385,7 @@ export default function LandingPage() {
                 placeholder="ENTER EMAIL FOR UPDATES"
                 className="bg-[#111] border-2 border-white/20 px-4 py-4 text-sm font-mono uppercase tracking-widest outline-none focus:border-[#CCFF00] w-full sm:max-w-[300px]"
               />
-              <button className="bg-[#CCFF00] text-black font-black px-6 py-4 uppercase tracking-widest text-sm border-2 border-[#CCFF00] hover:bg-white hover:border-white hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#FFF] transition-all">
+              <button className="bg-[#CCFF00] text-black font-black px-6 py-4 uppercase tracking-widest text-sm border-2 border-[#CCFF00] hover:bg-white hover:border-white">
                 Subscribe
               </button>
             </div>

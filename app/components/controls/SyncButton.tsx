@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import { useAssetStore } from "@/app/stores/assetStore";
 import { useUiStore } from "@/app/stores/uiStore";
 import { ASSETS } from "@/app/constants/assets";
+import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 
 export function SyncButton() {
@@ -29,22 +30,17 @@ export function SyncButton() {
   };
 
   return (
-    <button
+    <Button
+      variant="outline"
       onClick={handleSync}
       disabled={isSyncing}
-      className={clsx(
-        "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-        "border border-border hover:border-border-hover",
-        isSyncing
-          ? "opacity-60 cursor-not-allowed"
-          : "hover:bg-surface-hover active:scale-[0.98]"
-      )}
+      className="w-full sm:w-auto"
     >
       <RefreshCw
         size={16}
-        className={clsx(isSyncing && "animate-spin")}
+        className={clsx("mr-2", isSyncing && "animate-spin")}
       />
       <span>{isSyncing ? "Syncing..." : "Sync Live Data"}</span>
-    </button>
+    </Button>
   );
 }

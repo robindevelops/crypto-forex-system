@@ -3,8 +3,6 @@
 import {
   Menu,
   Bell,
-  Sun,
-  Moon,
   CircleDot,
   User,
 } from "lucide-react";
@@ -21,7 +19,7 @@ interface TopNavbarProps {
 
 export function TopNavbar({ title }: TopNavbarProps) {
   const { selectedAsset, syncStatus } = useAssetStore();
-  const { toggleSidebar, theme, toggleTheme } = useUiStore();
+  const { toggleSidebar } = useUiStore();
   const asset = ASSETS[selectedAsset];
   const sync = syncStatus[selectedAsset];
 
@@ -78,14 +76,6 @@ export function TopNavbar({ title }: TopNavbarProps) {
           {/* Divider */}
           <div className="w-0.5 h-6 bg-border hidden sm:block" />
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 text-text-secondary hover:text-black hover:bg-[#CCFF00] border-2 border-transparent hover:border-black transition-colors"
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
 
           {/* Notifications */}
           <button
