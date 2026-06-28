@@ -230,6 +230,48 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* MARKET NEWS SECTION */}
+      <section className="py-24 md:py-32 bg-[#050505] text-white border-y-4 border-white/10 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div>
+              <div className="inline-block bg-[#CCFF00] text-black px-4 py-2 font-black uppercase tracking-widest text-sm mb-6 transform -rotate-2 shadow-[4px_4px_0_0_#FFF]">
+                Live Market Pulse
+              </div>
+              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
+                Global<br/>Intelligence
+              </h2>
+            </div>
+            <p className="text-white/60 font-bold max-w-sm text-lg md:text-xl">
+              Real-world events drive market volatility. Stay ahead with AI-curated financial news.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {MARKET_NEWS.map((news) => (
+              <div key={news.id} className="bg-[#111] border-4 border-white/20 p-6 hover:bg-[#CCFF00] hover:text-black hover:border-black transition-all hover:-translate-y-2 hover:shadow-[12px_12px_0_0_#FFF] group relative flex flex-col justify-between min-h-[300px]">
+                <div>
+                  <div className="flex justify-between items-center mb-6 border-b-2 border-white/10 group-hover:border-black/20 pb-4">
+                    <span className="font-mono text-xs font-bold tracking-widest uppercase">{news.source}</span>
+                    <span className="font-mono text-xs font-bold text-white/50 group-hover:text-black/60">{news.time}</span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-black leading-tight mb-6">
+                    {news.headline}
+                  </h3>
+                </div>
+                <div className="flex items-center justify-between border-t-2 border-white/10 group-hover:border-black/20 pt-4 mt-auto">
+                  <span className="text-xs font-black uppercase tracking-widest">Impact</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-widest text-white/60 group-hover:text-black/60">{news.impact}</span>
+                    <div className="w-3 h-3 rounded-full border-2 border-white/20 group-hover:border-black/20" style={{ backgroundColor: news.color }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ASSETS SECTION - NEO-BRUTALIST */}
       <section className="py-32 border-y-4 border-black bg-[#111] relative overflow-hidden">
         {/* Background text */}
