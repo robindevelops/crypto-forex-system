@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,6 +24,15 @@ import { INDICATORS } from "@/app/constants/indicators";
 import type { IndicatorId } from "@/app/constants/indicators";
 import clsx from "clsx";
 
+type Timeframe = "1M" | "3M" | "6M" | "1Y" | "ALL";
+const TIMEFRAMES: { id: Timeframe; days: number }[] = [
+  { id: "1M", days: 30 },
+  { id: "3M", days: 90 },
+  { id: "6M", days: 180 },
+  { id: "1Y", days: 365 },
+  { id: "ALL", days: 0 }, // 0 means all data
+];
+
 interface PriceLineChartProps {
   data: FeatureRecord[];
   assetId: AssetId;
@@ -38,22 +48,43 @@ function CustomTooltip({ active, payload, label }: any) {
   return (
     <div style={CHART_TOOLTIP_STYLE}>
       <p className="text-xs text-text-muted mb-1.5 font-mono">{label}</p>
-      {payload.map((entry: any, i: number) => (
-        <div key={i} className="flex items-center justify-between gap-4 text-xs">
-          <span className="flex items-center gap-1.5">
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            {entry.name}
-          </span>
-          <span className="font-mono font-medium">{
-            typeof entry.value === "number"
-              ? entry.value.toLocaleString(undefined, { maximumFractionDigits: 2 })
-              : entry.value
-          }</span>
-        </div>
-      ))}
+      {payload.map((entry: any, i: number) => {
+        // If this is the main Price line, show OHLC details
+        if (entry.name === "Price") {
+          const { open, high, low, close } = entry.payload;
+          return (
+            <div key={i} className="mb-2 pb-2 border-b border-border/50">
+              <div className="flex items-center justify-between gap-4 text-xs font-bold mb-1" style={{ color: entry.color }}>
+                <span>{entry.name} (Close)</span>
+                <span className="font-mono">{close.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1 text-[10px] text-muted-foreground">
+                <div className="flex justify-between"><span>O:</span><span className="font-mono">{open}</span></div>
+                <div className="flex justify-between"><span>H:</span><span className="font-mono">{high}</span></div>
+                <div className="flex justify-between"><span>L:</span><span className="font-mono">{low}</span></div>
+              </div>
+            </div>
+          );
+        }
+        
+        // Render other indicators normally
+        return (
+          <div key={i} className="flex items-center justify-between gap-4 text-xs py-0.5">
+            <span className="flex items-center gap-1.5">
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              {entry.name}
+            </span>
+            <span className="font-mono font-medium">{
+              typeof entry.value === "number"
+                ? entry.value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                : entry.value
+            }</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -66,14 +97,24 @@ export function PriceLineChart({
   height = 420,
   className,
 }: PriceLineChartProps) {
+  const [timeframe, setTimeframe] = useState<Timeframe>("1Y");
   const asset = ASSETS[assetId];
   const gradientId = `price-gradient-${assetId}`;
 
-  // Prepare chart data with formatted dates
-  const chartData = data.map((d) => ({
-    ...d,
-    dateLabel: formatDateShort(d.timestamp),
-  }));
+  // Filter and format chart data based on selected timeframe
+  const chartData = useMemo(() => {
+    const tf = TIMEFRAMES.find(t => t.id === timeframe);
+    const sliceCount = tf && tf.days > 0 ? tf.days : data.length;
+    
+    // Make sure we don't slice more than we have
+    const actualSlice = Math.min(sliceCount, data.length);
+    const slicedData = data.slice(-actualSlice);
+    
+    return slicedData.map((d) => ({
+      ...d,
+      dateLabel: formatDateShort(d.timestamp),
+    }));
+  }, [data, timeframe]);
 
   return (
     <div
@@ -82,13 +123,33 @@ export function PriceLineChart({
         className
       )}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-text-primary">
-          Price History
-        </h3>
-        <span className="text-xs text-text-muted font-mono">
-          {data.length} days
-        </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-semibold text-text-primary">
+            Price History
+          </h3>
+          <span className="text-xs text-text-muted font-mono bg-surface-hover px-2 py-0.5 rounded">
+            {chartData.length} days
+          </span>
+        </div>
+        
+        {/* Timeframe Selectors */}
+        <div className="flex items-center gap-1 bg-background p-1 rounded-md border border-border">
+          {TIMEFRAMES.map((tf) => (
+            <button
+              key={tf.id}
+              onClick={() => setTimeframe(tf.id)}
+              className={clsx(
+                "px-2.5 py-1 text-[11px] font-bold rounded-sm transition-all",
+                timeframe === tf.id
+                  ? "bg-surface-hover text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/50"
+              )}
+            >
+              {tf.id}
+            </button>
+          ))}
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={height}>
@@ -218,7 +279,8 @@ export function PriceLineChart({
             strokeWidth={2}
             fill={`url(#${gradientId})`}
             name="Price"
-            dot={false}
+            dot={chartData.length <= 90 ? { r: 3, fill: asset.color, strokeWidth: 0 } : false}
+            activeDot={{ r: 5, fill: asset.color, stroke: "#000", strokeWidth: 2 }}
             animationDuration={1000}
           />
         </AreaChart>

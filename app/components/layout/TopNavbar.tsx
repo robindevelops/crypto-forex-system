@@ -77,22 +77,11 @@ export function TopNavbar({ title }: TopNavbarProps) {
           <div className="w-0.5 h-6 bg-border hidden sm:block" />
 
 
-          {/* Notifications */}
-          <button
-            className="p-2 text-text-secondary hover:text-black hover:bg-[#CCFF00] border-2 border-transparent hover:border-black transition-colors relative"
-            aria-label="Notifications"
-          >
-            <Bell size={18} />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#FF0055] border-2 border-background" />
-          </button>
-
           {/* User Avatar */}
           <button
-            className="w-9 h-9 bg-[#CCFF00] border-2 border-black flex items-center justify-center text-black font-black hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#FFF] transition-all"
-            aria-label="User menu"
-          >
-            <User size={18} />
-          </button>
+            className="w-8 h-8 rounded-full bg-surface-hover border border-border hover:border-primary transition-colors"
+            aria-label="User profile"
+          />
         </div>
       </div>
     </header>

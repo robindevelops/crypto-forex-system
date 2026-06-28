@@ -46,6 +46,16 @@ export interface AssetStats {
   high30d: number;
   low30d: number;
   avgVolume: number;
+  latestVolume: number;
+}
+
+export interface AiSignal {
+  id: string;
+  assetId: AssetId;
+  timestamp: string;
+  type: "BULLISH" | "BEARISH" | "NEUTRAL";
+  message: string;
+  confidence: number;
 }
 
 export interface Asset {

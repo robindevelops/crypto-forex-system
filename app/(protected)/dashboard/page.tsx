@@ -2,7 +2,7 @@
 
 import { useAssetStore } from "@/app/stores/assetStore";
 import { ASSETS } from "@/app/constants/assets";
-import { MOCK_PRICE_HISTORY, MOCK_ASSET_STATS } from "@/app/lib/mock-data/price-history";
+import { MOCK_PRICE_HISTORY, MOCK_ASSET_STATS, MOCK_AI_SIGNALS } from "@/app/lib/mock-data/price-history";
 import { PriceLineChart, RSIChart, MACDChart } from "@/app/components/charts/PriceLineChart";
 import { MetricCard } from "@/app/components/data-display/MetricCard";
 import { MetricCardGrid } from "@/app/components/data-display/MetricCardGrid";
@@ -22,6 +22,9 @@ import {
   BarChart3,
   Calendar,
   Activity,
+  Zap,
+  Target,
+  AlertTriangle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +37,13 @@ export default function DashboardPage() {
   const asset = ASSETS[selectedAsset];
   const priceData = MOCK_PRICE_HISTORY[selectedAsset];
   const stats = MOCK_ASSET_STATS[selectedAsset];
+  const aiSignals = MOCK_AI_SIGNALS[selectedAsset] || [];
+
+  // Determine overall AI sentiment from the latest signal
+  const latestSignal = aiSignals[0];
+  const sentimentColor = 
+    latestSignal?.type === "BULLISH" ? "#22C55E" :
+    latestSignal?.type === "BEARISH" ? "#EF4444" : "#F59E0B";
 
   return (
     <div className="space-y-6">
@@ -95,11 +105,11 @@ export default function DashboardPage() {
           tooltip="Lowest price recorded in the last 30 days"
         />
         <MetricCard
-          label="Avg Volume"
-          value={formatVolume(stats.avgVolume)}
+          label="24h Volume"
+          value={formatVolume(stats.latestVolume)}
           accentColor="#3B82F6"
           icon={<BarChart3 size={14} />}
-          tooltip="Average daily trading volume over the last 30 days"
+          tooltip="Total trading volume over the last 24 hours"
         />
         <MetricCard
           label="Data Points"
@@ -137,6 +147,39 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
+          {/* AI Sentiment */}
+          <Card className="border-primary/50 shadow-[0_0_15px_rgba(204,255,0,0.05)]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center justify-between">
+                AI Sentiment
+                {latestSignal && (
+                  <Badge 
+                    variant="outline" 
+                    style={{ borderColor: sentimentColor, color: sentimentColor }}
+                  >
+                    {latestSignal.confidence}% Conf.
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-background"
+                  style={{ border: `2px solid ${sentimentColor}`, color: sentimentColor }}
+                >
+                  <Target size={20} />
+                </div>
+                <div>
+                  <p className="text-lg font-black tracking-widest" style={{ color: sentimentColor }}>
+                    {latestSignal?.type || "ANALYZING"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Overall network prediction</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Quick Predict */}
           <Card>
             <CardHeader className="pb-3">
@@ -168,6 +211,33 @@ export default function DashboardPage() {
               <StatRow label="P25" value={formatCurrency(stats.p25, selectedAsset)} />
               <StatRow label="Median" value={formatCurrency(stats.p50, selectedAsset)} />
               <StatRow label="P75" value={formatCurrency(stats.p75, selectedAsset)} />
+            </CardContent>
+          </Card>
+
+          {/* Recent AI Signals */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Zap size={14} className="text-primary" />
+                Recent Signals
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {aiSignals.map((signal) => (
+                <div key={signal.id} className="flex gap-3 text-sm p-2 rounded-md bg-surface-hover/50 border border-border">
+                  <div className="mt-0.5 shrink-0">
+                    {signal.type === "BULLISH" ? <TrendingUp size={14} className="text-[#22C55E]" /> :
+                     signal.type === "BEARISH" ? <TrendingUp size={14} className="text-[#EF4444] rotate-180" /> :
+                     <AlertTriangle size={14} className="text-[#F59E0B]" />}
+                  </div>
+                  <div>
+                    <p className="text-foreground leading-snug">{signal.message}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {new Date(signal.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>

@@ -1,5 +1,5 @@
 import type { AssetId } from "@/app/constants/assets";
-import type { FeatureRecord, AssetStats } from "@/app/types/asset.types";
+import type { FeatureRecord, AssetStats, AiSignal } from "@/app/types/asset.types";
 
 // --- Seeded random number generator for deterministic mock data ---
 function seededRandom(seed: number) {
@@ -182,7 +182,8 @@ function computeStats(
   const closes = data.map((d) => d.close);
   const sorted = [...closes].sort((a, b) => a - b);
   const last30 = data.slice(-30);
-  const latestClose = data[data.length - 1].close;
+  const latestData = data[data.length - 1];
+  const latestClose = latestData.close;
   const previousClose = data[data.length - 2].close;
   const mean = closes.reduce((s, v) => s + v, 0) / closes.length;
   const std = Math.sqrt(
@@ -217,6 +218,7 @@ function computeStats(
       Math.round(
         last30.reduce((s, d) => s + d.volume, 0) / last30.length
       ),
+    latestVolume: latestData.volume,
   };
 }
 
@@ -224,4 +226,21 @@ export const MOCK_ASSET_STATS: Record<AssetId, AssetStats> = {
   bitcoin: computeStats("bitcoin", MOCK_PRICE_HISTORY.bitcoin),
   gold: computeStats("gold", MOCK_PRICE_HISTORY.gold),
   silver: computeStats("silver", MOCK_PRICE_HISTORY.silver),
+};
+
+// --- Mock AI Signals ---
+export const MOCK_AI_SIGNALS: Record<AssetId, AiSignal[]> = {
+  bitcoin: [
+    { id: "sig-1", assetId: "bitcoin", timestamp: new Date().toISOString(), type: "BULLISH", message: "LSTM model detects strong upward momentum.", confidence: 87 },
+    { id: "sig-2", assetId: "bitcoin", timestamp: new Date(Date.now() - 3600000).toISOString(), type: "BULLISH", message: "MACD crossover indicates short-term buy signal.", confidence: 75 },
+    { id: "sig-3", assetId: "bitcoin", timestamp: new Date(Date.now() - 86400000).toISOString(), type: "NEUTRAL", message: "Price approaching critical resistance at $70,000.", confidence: 60 },
+  ],
+  gold: [
+    { id: "sig-4", assetId: "gold", timestamp: new Date().toISOString(), type: "BEARISH", message: "RSI indicating overbought conditions. Potential correction.", confidence: 82 },
+    { id: "sig-5", assetId: "gold", timestamp: new Date(Date.now() - 7200000).toISOString(), type: "BEARISH", message: "Price rejected at upper Bollinger Band.", confidence: 68 },
+  ],
+  silver: [
+    { id: "sig-6", assetId: "silver", timestamp: new Date().toISOString(), type: "BULLISH", message: "Consolidation phase ending. Breakout predicted.", confidence: 79 },
+    { id: "sig-7", assetId: "silver", timestamp: new Date(Date.now() - 14400000).toISOString(), type: "NEUTRAL", message: "Low volatility. Waiting for directional signal.", confidence: 55 },
+  ],
 };
